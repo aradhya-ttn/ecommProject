@@ -15,7 +15,7 @@ public interface UserRepository extends CrudRepository<User,Integer> {
     User findByEmail(String email);
     User findById(Long id);
 
-    @Query(value = "select id,first_name,middle_name,last_name,email,is_active from user where id in (select user_id from customer )",nativeQuery = true)
+    @Query(value = "select id,first_name,middle_name,last_name,email,is_active,image_path from user where id in (select user_id from customer )",nativeQuery = true)
     public List<Object[]> allCustomers(PageRequest pageRequest);
 
     @Query(value = "select u.id,u.first_name,u.middle_name,u.last_name,u.email,u.is_active,s.company_contact,s.company_name,s.gst from user u inner join seller s on  u.id=s.user_id",nativeQuery = true)
@@ -26,4 +26,6 @@ public interface UserRepository extends CrudRepository<User,Integer> {
     @Query(value = "update user set password= :Password where email=:Email",nativeQuery = true)
     public void updatePassword(@Param("Password") String password, @Param("Email") String email);
 
+    @Query(value="select u.id ,u.first_name,u.last_name,u.is_active,u.image_path,c.contact from user u inner join customer c on u.id=c.user_id;",nativeQuery = true)
+    public List<Object[]> customerProfile(String email);
 }

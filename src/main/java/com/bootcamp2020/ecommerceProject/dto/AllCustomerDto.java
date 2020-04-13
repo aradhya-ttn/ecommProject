@@ -8,12 +8,22 @@ public class AllCustomerDto {
     private String fullName;
     private String email;
     private Boolean isActive;
+    private String imagePath;
 
-    public AllCustomerDto(BigInteger id, String fullName, String email, Boolean isActive) {
+    public AllCustomerDto(BigInteger id, String fullName, String email, Boolean isActive, String imagePath) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.isActive = isActive;
+        this.imagePath = imagePath;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
     public BigInteger getId() {

@@ -15,7 +15,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 @EnableResourceServer
@@ -53,6 +52,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
         http
                 .authorizeRequests()
                 .antMatchers("/register/customer").anonymous()
+                .antMatchers("/uploadImage").permitAll()
                 .antMatchers("/register/seller").anonymous()
                 .antMatchers("/email/sendEmail").anonymous()
                 .antMatchers("/registrationConfirm").anonymous()
@@ -60,9 +60,10 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .antMatchers("/address/user/{id}").anonymous()
                 .antMatchers("/password/reset").anonymous()
                 .antMatchers("/password/update").anonymous()
+                .antMatchers("/customer/profile").hasAnyRole("CUSTOMER")
                 .antMatchers("/admin/home").hasAnyRole("ADMIN")
-                .antMatchers("/admin/customers").anonymous()
-                .antMatchers("/admin/sellers").anonymous()
+                .antMatchers("/admin/customers").hasAnyRole("ADMIN")
+                .antMatchers("/admin/sellers").hasAnyRole("ADMIN")
                 .antMatchers("/admin/activateCustomer").hasAnyRole("ADMIN")
                 .antMatchers("/admin/deactivateCustomer").hasAnyRole("ADMIN")
                 .antMatchers("/admin/activateSeller").hasAnyRole("ADMIN")
@@ -73,6 +74,6 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .csrf().disable().addFilterBefore(new CustomFilter(), BasicAuthenticationFilter.class);
+                .csrf().disable();
     }
 }

@@ -12,16 +12,16 @@ public class User {
     @Column(unique = true)
     private String email;
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
-    private List<Address> addresses;
-
-    public List<Address> getAddresses() {
-        return addresses;
-    }
-
-    public void setAddresses(List<Address> addresses) {
-        this.addresses = addresses;
-    }
+//    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+//    private List<Address> addresses;
+//
+//    public List<Address> getAddresses() {
+//        return addresses;
+//    }
+//
+//    public void setAddresses(List<Address> addresses) {
+//        this.addresses = addresses;
+//    }
 
     public Seller getSeller() {
         return seller;
@@ -48,6 +48,7 @@ public class User {
 
 
     private String password;
+    private String imagePath;
     private Boolean isDeleted = false;
     private Boolean isActive = false;
     private Boolean isAccountNonLocked=true;
@@ -69,6 +70,14 @@ public class User {
 
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
     private Seller seller;
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
 
     public Customer getCustomer() {
         return customer;

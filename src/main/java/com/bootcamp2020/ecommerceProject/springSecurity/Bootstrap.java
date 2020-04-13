@@ -20,10 +20,10 @@ import java.util.List;
 public class Bootstrap implements ApplicationRunner {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    CustomerRepository customerRepository;
+    private CustomerRepository customerRepository;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -31,6 +31,7 @@ public class Bootstrap implements ApplicationRunner {
             PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             User user1 = new User();
             user1.setEmail("user");
+            user1.setActive(true);
             Name name= new Name();
             name.setFirstName("aradhya");
             name.setMiddleName("kumar");
@@ -45,17 +46,18 @@ public class Bootstrap implements ApplicationRunner {
             address.setLabel(Label.home);
             address.setZipCode(201308);
             addresses.add(address);
-            address.setUser(user1);
+
             Customer customer= new Customer();
-            user1.setAddresses(addresses);
+            customer.setAddresses(addresses);
             customer.setUser(user1);
             customer.setContact("7754076598");
             customerRepository.save(customer);
             user1.setPassword(passwordEncoder.encode("pass"));
-            user1.setRoles(Arrays.asList(new Role("ROLE_USER"),new Role("ROLE_SELLER")));
+            user1.setRoles(Arrays.asList(new Role("ROLE_CUSTOMER"),new Role("ROLE_SELLER")));
 
             User user2 = new User();
             user2.setEmail("admin");
+            user2.setActive(true);
             user2.setPassword(passwordEncoder.encode("pass"));
             user2.setRoles(Arrays.asList(new Role("ROLE_ADMIN"),new Role("ROLE_SELLER")));
 

@@ -9,6 +9,7 @@ public class Seller {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(unique = true)
     private String gst;
 
@@ -18,13 +19,38 @@ public class Seller {
 
     private String companyContact;
     private String companyName;
+
     @MapsId
     @OneToOne
     @JoinColumn(name = "UserId")
     private  User user;
 
-//    @OneToMany(mappedBy = "seller",cascade = CascadeType.ALL)
-//    private List<Address> addresses;
+    @OneToOne(mappedBy = "seller",cascade = CascadeType.ALL)
+    private Address address;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
 
     public User getUser() {
         return user;
@@ -34,13 +60,6 @@ public class Seller {
         this.user = user;
     }
 
-//    public List<Address> getAddresses() {
-//        return addresses;
-//    }
-//
-//    public void setAddresses(List<Address> addresses) {
-//        this.addresses = addresses;
-//    }
 
     public String getGst() {
         return gst;

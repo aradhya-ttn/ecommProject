@@ -1,5 +1,6 @@
 package com.bootcamp2020.ecommerceProject.dao;
 
+import com.bootcamp2020.ecommerceProject.dto.CustomerProfileDto;
 import com.bootcamp2020.ecommerceProject.dto.CustomerRegisterDto;
 import com.bootcamp2020.ecommerceProject.entities.*;
 import com.bootcamp2020.ecommerceProject.exceptions.EmailException;
@@ -15,7 +16,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.WebRequest;
 
+import javax.servlet.http.HttpServletRequest;
+import java.math.BigInteger;
+import java.security.Principal;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -54,6 +59,7 @@ public class CustomerDao {
             name.setLastName(customerRegister.getLastName());
             user.setName(name);
             user.setActive(false);
+            user.setAccountNonLocked(true);
             user.setPassword(passwordEncoder.encode(customerRegister.getPassword()));
             Customer customer = new Customer();
             customer.setUser(user);
@@ -84,6 +90,17 @@ public class CustomerDao {
             javaMailSender.send(mailMessage);
 
         }
+    }
+    public CustomerProfileDto getMyProfile(HttpServletRequest request){
+        Principal principal=request.getUserPrincipal();
+        String email=principal.getName();
+        CustomerProfileDto customerProfileDto=null;
+        List<Object[]> objects=userRepository.customerProfile(email);
+        for (Object[] customer:objects) {
+           customerProfileDto = new CustomerProfileDto((BigInteger) customer[0], (String)customer[1], (String)customer[2], (Boolean)customer[3],
+                    (String)customer[4], (String)customer[5]);
+        }
+        return customerProfileDto;
     }
 
 }

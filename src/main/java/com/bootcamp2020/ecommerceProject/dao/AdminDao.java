@@ -50,8 +50,8 @@ public class AdminDao {
         List<AllCustomerDto>  allCustomerDtos= new ArrayList<>();
         List<Object[]> objects=userRepository.allCustomers(pageRequest);
         for (Object[] customer:objects) {
-            allCustomerDtos.add(new AllCustomerDto((BigInteger)customer[0],(String)customer[1]+" "+(String)customer[2]
-                    +" "+(String)customer[3],(String)customer[4],(Boolean)customer[5]));
+            allCustomerDtos.add(new AllCustomerDto((BigInteger)customer[0],((String)customer[1]+" "+(String)customer[2]
+                    +" "+(String)customer[3]),(String)customer[4],(Boolean)customer[5],(String)customer[6]));
         }
         return allCustomerDtos;
     }

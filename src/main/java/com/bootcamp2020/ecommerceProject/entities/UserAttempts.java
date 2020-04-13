@@ -1,41 +1,42 @@
 package com.bootcamp2020.ecommerceProject.entities;
 
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 public class UserAttempts {
     @Id
-    private int id;
-    private String username;
-    private int attempts;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String email;
+    private Integer attempts;
     private Date lastModified;
 
     //getter and setter
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public int getAttempts() {
+    public Integer getAttempts() {
         return attempts;
     }
 
-    public void setAttempts(int attempts) {
+    public void setAttempts(Integer attempts) {
         this.attempts = attempts;
     }
 

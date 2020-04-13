@@ -20,20 +20,14 @@ public class Address {
     private Label label;
 
     @ManyToOne
-    @JoinColumn(name = "UserId")
-    private  User user;
+    @JoinColumn(name = "CustomerUserId")
+    private  Customer customer;
 
-//    @ManyToOne
-//    @JoinColumn(name = "SellerId")
-//    private  Seller seller;
+    @OneToOne
+    @JoinColumn(name = "SellerId")
+    private  Seller seller;
 
-    public User getUser() {
-        return user;
-    }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
 
     public Long getId() {
         return id;
@@ -43,13 +37,13 @@ public class Address {
         this.id = id;
     }
 
-//    public Seller getSeller() {
-//        return seller;
-//    }
-//
-//    public void setSeller(Seller seller) {
-//        this.seller = seller;
-//    }
+    public Seller getSeller() {
+        return seller;
+    }
+
+    public void setSeller(Seller seller) {
+        this.seller = seller;
+    }
 
     public String getCity() {
         return city;
