@@ -26,6 +26,7 @@ public interface UserRepository extends CrudRepository<User,Integer> {
     @Query(value = "update user set password= :Password where email=:Email",nativeQuery = true)
     public void updatePassword(@Param("Password") String password, @Param("Email") String email);
 
-    @Query(value="select u.id ,u.first_name,u.last_name,u.is_active,u.image_path,c.contact from user u inner join customer c on u.id=c.user_id;",nativeQuery = true)
-    public List<Object[]> customerProfile(String email);
+    @Query(value="select u.id ,u.first_name,u.last_name,u.is_active,u.image_path,c.contact from user u inner join customer c on u.id=c.user_id where email=:Email",nativeQuery = true)
+    public List<Object[]> customerProfile(@Param("Email") String email);
+
 }

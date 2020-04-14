@@ -14,7 +14,7 @@ public class AddressDao {
     @Autowired
     AddressRepository addressRepository;
 
-    public Address getAddress(Integer userid){
+    public Address getAddress(Long userid){
       List<Object[]> addresslist= addressRepository.getAddress(userid);
             Address address = new Address();
         for (Object[] objects:addresslist) {

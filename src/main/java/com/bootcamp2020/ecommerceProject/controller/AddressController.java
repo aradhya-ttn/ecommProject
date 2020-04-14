@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 public class AddressController {
 
@@ -16,7 +14,7 @@ public class AddressController {
     AddressDao addressDao;
 
     @GetMapping("/address/user/{id}")
-    public Address getAddress(@PathVariable Integer id){
+    public Address getAddress(@PathVariable Long id){
 
        return addressDao.getAddress(id);
     }

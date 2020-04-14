@@ -37,6 +37,14 @@ public class Address {
         this.id = id;
     }
 
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
     public Seller getSeller() {
         return seller;
     }
