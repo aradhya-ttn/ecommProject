@@ -20,6 +20,16 @@ public class  ProductVariation {
 
     private String primaryImageName;
 
+    private Boolean isActive;
+
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
+    }
+
     public Long getId() {
         return id;
     }
