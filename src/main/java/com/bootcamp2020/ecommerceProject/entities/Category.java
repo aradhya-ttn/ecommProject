@@ -1,7 +1,7 @@
 package com.bootcamp2020.ecommerceProject.entities;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Category {
@@ -12,8 +12,12 @@ public class Category {
 
     private String name;
 
+    private Long parentId;
+    @OneToMany(mappedBy = "category",cascade = CascadeType.ALL)
+    private Set<CategoryMetadataFieldValues> categoryMetadataFieldValuesList;
+
     @OneToMany(mappedBy = "category")
-    private List<Product> products;
+    private Set<Product> products;
 
     public Long getId() {
         return id;
@@ -31,11 +35,27 @@ public class Category {
         this.name = name;
     }
 
-    public List<Product> getProducts() {
+    public Set<Product> getProducts() {
         return products;
     }
 
-    public void setProducts(List<Product> products) {
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
+    }
+
+    public void setProducts(Set<Product> products) {
         this.products = products;
+    }
+
+    public Set<CategoryMetadataFieldValues> getCategoryMetadataFieldValuesList() {
+        return categoryMetadataFieldValuesList;
+    }
+
+    public void setCategoryMetadataFieldValuesList(Set<CategoryMetadataFieldValues> categoryMetadataFieldValuesList) {
+        this.categoryMetadataFieldValuesList = categoryMetadataFieldValuesList;
     }
 }

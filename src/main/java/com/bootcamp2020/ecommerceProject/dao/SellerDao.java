@@ -240,7 +240,6 @@ public class SellerDao {
                 address.setZipCode(zipCode);
             }
             addressRepository.save(address);
-            System.out.println("Address saved");
             String message=messageSource.getMessage("msg.address.update",null,locale);
             return message;
         }else{
