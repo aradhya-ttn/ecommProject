@@ -29,7 +29,7 @@ public class Product {
     private Boolean isCancellable;
     private Boolean isReturnable;
     private String brand;
-    private Boolean isActive;
+    private Boolean isActive=false;
 
     public Long getId() {
         return id;
@@ -118,4 +118,6 @@ public class Product {
     public void setActive(Boolean active) {
         isActive = active;
     }
+
+
 }

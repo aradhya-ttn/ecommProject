@@ -116,4 +116,9 @@ public class AdminController {
     private String updateValues(@RequestBody CategoryMetadatfieldValuesDto categoryMetadatfieldValuesDto,WebRequest webRequest){
         return categoryDao.updateCategoryMetadataFieldValues(categoryMetadatfieldValuesDto,webRequest);
     }
+
+    @PutMapping(value = "/activateProduct")
+    private String activateProduct(@RequestParam("productId") Long productId,WebRequest webRequest){
+        return adminDao.activateProduct(productId,webRequest);
+    }
 }

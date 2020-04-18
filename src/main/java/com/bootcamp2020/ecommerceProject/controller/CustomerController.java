@@ -1,7 +1,9 @@
 package com.bootcamp2020.ecommerceProject.controller;
 
+import com.bootcamp2020.ecommerceProject.dao.CategoryDao;
 import com.bootcamp2020.ecommerceProject.dao.CustomerDao;
 import com.bootcamp2020.ecommerceProject.dto.CustomerAddressDto;
+import com.bootcamp2020.ecommerceProject.dto.CustomerCategoryDto;
 import com.bootcamp2020.ecommerceProject.dto.CustomerProfileDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,9 @@ public class CustomerController {
 
     @Autowired
     private CustomerDao customerDao;
+
+    @Autowired
+    private CategoryDao categoryDao;
 
     @GetMapping(value = "/profile")
     public CustomerProfileDto getProfile(HttpServletRequest request){
@@ -54,4 +59,8 @@ public class CustomerController {
         return customerDao.updateAddress(value,id,request,webRequest);
     }
 
+    @GetMapping(value = "/getAllCategory")
+    public List<CustomerCategoryDto> getAllCategoryForCustomer(@RequestParam("categoryId") Long categoryId){
+        return categoryDao.getAllCategoryForCustomer(categoryId);
+    }
 }

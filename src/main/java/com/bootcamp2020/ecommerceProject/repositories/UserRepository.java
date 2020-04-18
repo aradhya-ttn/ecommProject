@@ -29,4 +29,7 @@ public interface UserRepository extends CrudRepository<User,Integer> {
     @Query(value="select u.id ,u.first_name,u.last_name,u.is_active,u.image_path,c.contact from user u inner join customer c on u.id=c.user_id where email=:Email",nativeQuery = true)
     public List<Object[]> customerProfile(@Param("Email") String email);
 
+    @Query(value = "select * from user where id in (select user_id from user_role where role_id in(select id from role where authority='ROLE_ADMIN'))",nativeQuery = true)
+    public List<User> getAllAdmin();
+
 }

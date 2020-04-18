@@ -2,6 +2,9 @@ package com.bootcamp2020.ecommerceProject.dao;
 
 import com.bootcamp2020.ecommerceProject.dto.CategoryDto;
 import com.bootcamp2020.ecommerceProject.dto.CategoryMetadatfieldValuesDto;
+import com.bootcamp2020.ecommerceProject.dto.CustomerCategoryDto;
+import com.bootcamp2020.ecommerceProject.dto.categorySellerDtos.CategoryAndSubCategoryDto;
+import com.bootcamp2020.ecommerceProject.dto.categorySellerDtos.MetadatafieldNameAndValuesDto;
 import com.bootcamp2020.ecommerceProject.entities.Category;
 import com.bootcamp2020.ecommerceProject.entities.CategoryMetadataField;
 import com.bootcamp2020.ecommerceProject.entities.CategoryMetadataFieldAndValues;
@@ -111,6 +114,7 @@ public class CategoryDao {
            List<String>categoriesValues=getParents(id,categories);
            CategoryDto categoryDto=new CategoryDto();
            categoryDto.setId(id);
+           categoryDto.setName(category.getName());
            categoryDto.setParentCategory(categoriesValues);
            if(!child.isEmpty()) {
                categoryDto.setSubCategory(child.get(0).getName());
@@ -251,5 +255,50 @@ public class CategoryDao {
             throw new EmailException(message);
         }
     }
+    public List<CategoryAndSubCategoryDto> getAllCategoryForSeller(){
+        List<CategoryAndSubCategoryDto> categoryAndSubCategoryDtoList=new ArrayList<>();
+        List<Category> allLeafChild = categoryRepository.getAllLeafChild();
+        for (Category category: allLeafChild) {
+            Long categoryId=category.getId();
+            List<String> parents=new ArrayList<>();
+            parents =getParents(category.getParentId(),parents);
+            CategoryAndSubCategoryDto categoryAndSubCategoryDto=new CategoryAndSubCategoryDto();
+            List<MetadatafieldNameAndValuesDto> nameAndValuesDtos=new ArrayList<>();
+            categoryAndSubCategoryDto.setCategoryId(categoryId);
+            categoryAndSubCategoryDto.setParentName(parents);
+            categoryAndSubCategoryDto.setCategoryName(category.getName());
+            List<Object[]> metadataNameAndValues = categoryRepository.getMetadataNameAndValues(categoryId);
+            for (Object[] object:  metadataNameAndValues) {
+                MetadatafieldNameAndValuesDto metadatafieldNameAndValuesDto=new MetadatafieldNameAndValuesDto();
+                metadatafieldNameAndValuesDto.setMetadataFieldName((String) object[0]);
+                metadatafieldNameAndValuesDto.setMetadataFieldValues((String)object[1]);
+                nameAndValuesDtos.add(metadatafieldNameAndValuesDto);
+            }
+            categoryAndSubCategoryDto.setMetadatafieldNameAndValues(nameAndValuesDtos);
+            categoryAndSubCategoryDtoList.add(categoryAndSubCategoryDto);
+        }
+        return categoryAndSubCategoryDtoList;
+    }
 
+    public List<CustomerCategoryDto> getAllCategoryForCustomer(Long categoryId){
+        List<CustomerCategoryDto> customerCategoryDtos=new ArrayList<>();
+        if(categoryId==null){
+            List<Category> rootParent = categoryRepository.getRootParent();
+            for (Category category: rootParent) {
+                CustomerCategoryDto customerCategoryDto=new CustomerCategoryDto();
+                customerCategoryDto.setCategoryid(category.getId());
+                customerCategoryDto.setCategoryName(category.getName());
+                customerCategoryDtos.add(customerCategoryDto);
+            }
+        }else{
+            List<Category> categoryList = categoryRepository.findByParentId(categoryId);
+            for (Category category: categoryList) {
+                CustomerCategoryDto customerCategoryDto=new CustomerCategoryDto();
+                customerCategoryDto.setCategoryid(category.getId());
+                customerCategoryDto.setCategoryName(category.getName());
+                customerCategoryDtos.add(customerCategoryDto);
+            }
+        }
+        return customerCategoryDtos;
+    }
 }

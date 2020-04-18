@@ -1,6 +1,7 @@
 package com.bootcamp2020.ecommerceProject.dao;
 
 import com.bootcamp2020.ecommerceProject.entities.User;
+import com.bootcamp2020.ecommerceProject.exceptions.EmailException;
 import com.bootcamp2020.ecommerceProject.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -15,6 +16,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Component
@@ -28,16 +31,17 @@ public class ImageDao {
 
     public String uploadImage(MultipartFile imageFile , WebRequest webRequest, HttpServletRequest request) throws IOException {
         Locale locale=webRequest.getLocale();
-
-
         if (imageFile.isEmpty()) {
             String emptyMessage=messageSource.getMessage("msg.image.empty",null,locale);
             return emptyMessage;
         }
-
         try {
+            String regex= "([^\\s]+(\\.(?i)(jpg|png|gif|jpeg|bmp))$)";
+             Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(imageFile.getName());
+             Boolean isImageValid=matcher.matches();
+             if(isImageValid){
             // Get the file and save it somewhere
-
             String folder="/home/aradhya/images/";
             byte[] bytes = imageFile.getBytes();
             String extension=getFileName(imageFile);
@@ -49,8 +53,11 @@ public class ImageDao {
             user.setImagePath(""+path);
             userRepository.save(user);
             Files.write(path, bytes);
-
-            String successMessage=messageSource.getMessage("msg.image.success",null,locale);
+             }else{
+                 String message=messageSource.getMessage("msg.image.invalid",null,locale);
+                 throw new EmailException(message);
+             }
+             String successMessage=messageSource.getMessage("msg.image.success",null,locale);
             return successMessage;
         }
         catch (IOException e) {

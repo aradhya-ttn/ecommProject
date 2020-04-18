@@ -3,10 +3,12 @@ package com.bootcamp2020.ecommerceProject.dao;
 import com.bootcamp2020.ecommerceProject.dto.AllCustomerDto;
 import com.bootcamp2020.ecommerceProject.dto.AllSellerDto;
 import com.bootcamp2020.ecommerceProject.entities.Customer;
+import com.bootcamp2020.ecommerceProject.entities.Product;
 import com.bootcamp2020.ecommerceProject.entities.Seller;
 import com.bootcamp2020.ecommerceProject.entities.User;
 import com.bootcamp2020.ecommerceProject.exceptions.UserNotFoundException;
 import com.bootcamp2020.ecommerceProject.repositories.CustomerRepository;
+import com.bootcamp2020.ecommerceProject.repositories.ProductRepository;
 import com.bootcamp2020.ecommerceProject.repositories.SellerRepository;
 import com.bootcamp2020.ecommerceProject.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,9 @@ public class AdminDao {
 
     @Autowired
     private SellerRepository sellerRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     public List<AllCustomerDto> returnCustomer(String pageOffset, String pageSize, String field){
         Integer offSetPage=Integer.parseInt(pageOffset);
@@ -183,6 +188,24 @@ public class AdminDao {
             throw new UserNotFoundException(message);
         }
 
+    }
+    public String activateProduct(Long productId,WebRequest webRequest){
+        Locale locale=webRequest.getLocale();
+        Product product = productRepository.findByid(productId);
+        product.setActive(true);
+        productRepository.save(product);
+
+        String email = product.getSeller().getUser().getEmail();
+        SimpleMailMessage mailMessage=new SimpleMailMessage();
+        mailMessage.setTo(email);
+        String message=messageSource.getMessage("msg.seller.activated",null,locale);
+        mailMessage.setSubject(message);
+        String textMessage=messageSource.getMessage("msg.product.activated",null,locale);
+        String adminMessage=messageSource.getMessage("msg.by.admin",null,locale);
+        mailMessage.setText(textMessage+" "+product.getName()+" "+adminMessage);
+        String successMessage=messageSource.getMessage("msg.Activation.success",null,locale);
+        javaMailSender.send(mailMessage);
+        return successMessage;
     }
 
 }
