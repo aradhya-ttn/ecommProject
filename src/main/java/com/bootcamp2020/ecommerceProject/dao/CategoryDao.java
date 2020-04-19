@@ -78,19 +78,18 @@ public class CategoryDao {
         if(parentId!=null){
             if(name!=null && name!=""){
                 Category category1 = categoryRepository.findByid(parentId);
-                if(category1.getName().equals(name)){
-                    String message=messageSource.getMessage("msg.category.alreadyExist",null,locale);
-                    throw new UserNotFoundException(message+" with id = "+category1.getId());
-                }else if(category1==null){
+                if(category1==null){
                     String message=messageSource.getMessage("msg.category.parent.notExist",null,locale);
                     throw new UserNotFoundException(message);
-                }  else{
+                }else if(category1.getName().equals(name)){
+                    String message=messageSource.getMessage("msg.category.alreadyExist",null,locale);
+                    throw new UserNotFoundException(message+" with id = "+category1.getId());
+                }else {
                     category.setName(name);
                     category.setParentId(parentId);
                     categoryRepository.save(category);
                     String message=messageSource.getMessage("msg.category.save",null,locale);
                     return category.getName()+" "+message+" with Category Id = "+category.getId();
-
                 }
             }else{
                 String message=messageSource.getMessage("msg.category.null",null,locale);

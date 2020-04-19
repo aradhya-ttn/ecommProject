@@ -1,6 +1,9 @@
 package com.bootcamp2020.ecommerceProject.entities;
 
+import com.bootcamp2020.ecommerceProject.utils.HashMapConverter;
+
 import javax.persistence.*;
+import java.util.Map;
 
 @Entity
 public class  ProductVariation {
@@ -13,14 +16,17 @@ public class  ProductVariation {
     @JoinColumn(name = "ProductId")
     private Product product;
 
-    private Integer quantityAvailable;
-    private Double price;
+    private Integer quantityAvailable=0;
+    private Double price=0.0;
 
-    private String metadata;
+    @Convert(converter = HashMapConverter.class)
+    private Map<String,String> metadata;
 
     private String primaryImageName;
 
-    private Boolean isActive;
+    private String secondaryImageName;
+
+    private Boolean isActive=true;
 
     public Boolean getActive() {
         return isActive;
@@ -62,11 +68,11 @@ public class  ProductVariation {
         this.price = price;
     }
 
-    public String getMetadata() {
+    public Map<String, String > getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(String metadata) {
+    public void setMetadata(Map<String, String> metadata) {
         this.metadata = metadata;
     }
 
@@ -76,5 +82,13 @@ public class  ProductVariation {
 
     public void setPrimaryImageName(String primaryImageName) {
         this.primaryImageName = primaryImageName;
+    }
+
+    public String getSecondaryImageName() {
+        return secondaryImageName;
+    }
+
+    public void setSecondaryImageName(String secondaryImageName) {
+        this.secondaryImageName = secondaryImageName;
     }
 }

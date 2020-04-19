@@ -19,6 +19,6 @@ public class ImageController {
 
     @PostMapping("/uploadImage")
     public String uploadImage(@RequestBody MultipartFile imageFile , WebRequest webRequest, HttpServletRequest request)throws IOException {
-                 return imageDao.uploadImage(imageFile,webRequest,request);
+                 return imageDao.uploadImageForUser(imageFile,webRequest,request);
     }
 }

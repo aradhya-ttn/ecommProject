@@ -30,6 +30,7 @@ public class Product {
     private Boolean isReturnable;
     private String brand;
     private Boolean isActive=false;
+    private Boolean isDeleted=false;
 
     public Long getId() {
         return id;
@@ -119,5 +120,11 @@ public class Product {
         isActive = active;
     }
 
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
 
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
 }

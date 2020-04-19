@@ -1,26 +1,26 @@
 package com.bootcamp2020.ecommerceProject.dao;
 
+import com.bootcamp2020.ecommerceProject.dto.AddProductVariationDto;
 import com.bootcamp2020.ecommerceProject.dto.ProductDto;
-import com.bootcamp2020.ecommerceProject.entities.Category;
-import com.bootcamp2020.ecommerceProject.entities.Product;
-import com.bootcamp2020.ecommerceProject.entities.Seller;
-import com.bootcamp2020.ecommerceProject.entities.User;
+import com.bootcamp2020.ecommerceProject.dto.ViewProductDto;
+import com.bootcamp2020.ecommerceProject.dto.ViewProductVariationDto;
+import com.bootcamp2020.ecommerceProject.dto.categorySellerDtos.MetadatafieldNameAndValuesDto;
+import com.bootcamp2020.ecommerceProject.entities.*;
 import com.bootcamp2020.ecommerceProject.exceptions.EmailException;
-import com.bootcamp2020.ecommerceProject.repositories.CategoryRepository;
-import com.bootcamp2020.ecommerceProject.repositories.ProductRepository;
-import com.bootcamp2020.ecommerceProject.repositories.SellerRepository;
-import com.bootcamp2020.ecommerceProject.repositories.UserRepository;
+import com.bootcamp2020.ecommerceProject.repositories.*;
+import com.bootcamp2020.ecommerceProject.utils.SetConverter;
+import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.io.IOException;
+import java.util.*;
 
 @Component
 public class ProductDao {
@@ -41,7 +41,19 @@ public class ProductDao {
     private SellerRepository sellerRepository;
 
     @Autowired
+    private CategoryMetadataFieldValuesRepository valuesRepository;
+
+    @Autowired
+    private CategoryMetadataFieldRepository fieldRepository;
+
+    @Autowired
     private JavaMailSender javaMailSender;
+
+    @Autowired
+    private ImageDao imageDao;
+
+    @Autowired
+    private ProductVariationRepository variationRepository;
 
     public String addProduct(ProductDto productDto, HttpServletRequest request, WebRequest webRequest){
         Locale locale=webRequest.getLocale();
@@ -112,5 +124,185 @@ public class ProductDao {
             mailMessage.setFrom(user.getEmail());
             javaMailSender.send(mailMessage);
         }
+    }
+
+    public String addProductVariation(MultipartFile primaryImage, List<MultipartFile> secondaryImages,HttpServletRequest request, AddProductVariationDto addProductVariationDto,WebRequest webRequest) throws IOException {
+        Locale locale=webRequest.getLocale();
+        ProductVariation variation = variationRepository.findByProductId(addProductVariationDto.getProductId());
+        if(variation==null){
+        String sellerEmail = request.getUserPrincipal().getName();
+        String validateData = validateData(addProductVariationDto, sellerEmail, webRequest);
+        if(!validateData.equalsIgnoreCase("success")){
+            String message=messageSource.getMessage("msg.validation.failed",null,locale);
+            throw  new EmailException(message);
+        }
+        ProductVariation productVariation= new ProductVariation();
+        Product product = productRepository.findByid(addProductVariationDto.getProductId());
+        productVariation.setPrice(addProductVariationDto.getPrice());
+        productVariation.setProduct(product);
+        productVariation.setPrimaryImageName(imageDao.uploadPrimaryImage(primaryImage,webRequest,addProductVariationDto.getProductId()));
+        productVariation.setQuantityAvailable(addProductVariationDto.getQuantityAvailable());
+        productVariation.setMetadata(addProductVariationDto.getMetadata());
+        if(!secondaryImages.isEmpty()){
+            Set<String> strings = imageDao.uploadSecondaryImage(secondaryImages, webRequest, addProductVariationDto.getProductId());
+            String convert = SetConverter.convertToString(strings);
+            productVariation.setSecondaryImageName(convert);
+        }
+        variationRepository.save(productVariation);
+        String message=messageSource.getMessage("msg.variation.saved",null,locale);
+        return message;
+        }else{
+            String message=messageSource.getMessage("msg.variation.alreadyExist",null,locale);
+            return message;
+        }
+    }
+    private String validateData(AddProductVariationDto addProductVariationDto,String sellerEmail,WebRequest webRequest){
+        Locale locale=webRequest.getLocale();
+        Product product = productRepository.findByid(addProductVariationDto.getProductId());
+
+        if(product==null){
+            String message=messageSource.getMessage("msg.invalid.productId",null,locale);
+            throw new EmailException(message);
+        }
+        if(!product.getActive()){
+            String message=messageSource.getMessage("msg.product.inActive",null,locale);
+            throw new EmailException(message);
+        }
+        if(!product.getSeller().getUser().getEmail().equalsIgnoreCase(sellerEmail)){
+            String message=messageSource.getMessage("msg.seller.notProduct",null,locale);
+            throw new EmailException(message);
+        }
+        if(addProductVariationDto.getQuantityAvailable()!=null){
+            if(addProductVariationDto.getQuantityAvailable()<0 ){
+                String message=messageSource.getMessage("msg.quantity.greater",null,locale);
+                throw new EmailException(message);
+            }
+        }
+        if(addProductVariationDto.getPrice()!=null) {
+            if (addProductVariationDto.getPrice() < 0) {
+                String message = messageSource.getMessage("msg.price.greater", null, locale);
+                throw new EmailException(message);
+            }
+        }
+
+        if(product.getDeleted()){
+            String message=messageSource.getMessage("msg.product.deleted",null,locale);
+            throw new EmailException(message);
+        }
+        Category category=product.getCategory();
+        Long categoryId = category.getId();
+        Map<String, String> metadata = addProductVariationDto.getMetadata();
+        List<String> recievedFields =new ArrayList<>(metadata.keySet());
+        List<String> actualFields= new ArrayList<>();
+        List<Object> metadataFieldName = valuesRepository.getMetadataFieldName(categoryId);
+        metadataFieldName.forEach((e)->{
+            actualFields.add(e.toString());
+        });
+        if(recievedFields.size()<actualFields.size()){
+            String message=messageSource.getMessage("msg.field.less",null,locale);
+            throw new EmailException(message);
+        }
+        recievedFields.removeAll(actualFields);
+        if(!recievedFields.isEmpty()){
+            String message=messageSource.getMessage("msg.field.more",null,locale);
+            throw new EmailException(message);
+        }
+        List<String> metadataFields =new ArrayList<>(metadata.keySet());
+        for (String fieldName: metadataFields) {
+            CategoryMetadataField field = fieldRepository.findByName(fieldName);
+            List<Object> valueFromCategoryAndField= valuesRepository.getValueFromCategoryAndField(categoryId, field.getId());
+            String values=valueFromCategoryAndField.get(0).toString();
+            Set<String> valueSet= SetConverter.convertToSet(values);
+            String recievedValues= metadata.get(fieldName);
+            Set<String> stringSet = SetConverter.convertToSet(recievedValues);
+
+            if(!Sets.difference(valueSet,stringSet).isEmpty()){
+                String message=messageSource.getMessage("msg.values.more",null,locale);
+                throw new EmailException(message);
+            }
+        }
+        String message=messageSource.getMessage("msg.success",null,locale);
+        return message;
+    }
+
+    public ViewProductDto viewProduct(Long productId,WebRequest webRequest,HttpServletRequest request){
+        String sellerEmail = request.getUserPrincipal().getName();
+        Locale locale=webRequest.getLocale();
+        Optional<Product> productOptional=productRepository.findById(productId);
+        if(!productOptional.isPresent()){
+            String message=messageSource.getMessage("msg.invalid.productId",null,locale);
+            throw new EmailException(message);
+        }
+        Product product = productOptional.get();
+        String email = product.getSeller().getUser().getEmail();
+         if(!email.equalsIgnoreCase(sellerEmail)){
+            String message=messageSource.getMessage("msg.seller.notProduct",null,locale);
+            throw new EmailException(message);
+        }
+        else if(product.getDeleted()){
+            String message=messageSource.getMessage("msg.product.deleted",null,locale);
+            throw new EmailException(message);
+        }
+        ViewProductDto viewProductDto=new ViewProductDto();
+        viewProductDto.setProductName(product.getName());
+        viewProductDto.setBrand(product.getBrand());
+        viewProductDto.setDescription(product.getDescription());
+        viewProductDto.setCancellable(product.getCancellable());
+        viewProductDto.setReturnable(product.getReturnable());
+        viewProductDto.setActive(product.getActive());
+
+        Category category = product.getCategory();
+        viewProductDto.setCategoryId(category.getId());
+        viewProductDto.setCategoryName(category.getName());
+        List<MetadatafieldNameAndValuesDto> nameAndValuesDtos=new ArrayList<>();
+        List<Object[]> metadataNameAndValues = categoryRepository.getMetadataNameAndValues(category.getId());
+        for (Object[] object:  metadataNameAndValues) {
+            MetadatafieldNameAndValuesDto metadatafieldNameAndValuesDto=new MetadatafieldNameAndValuesDto();
+            metadatafieldNameAndValuesDto.setMetadataFieldName((String) object[0]);
+            metadatafieldNameAndValuesDto.setMetadataFieldValues((String)object[1]);
+            nameAndValuesDtos.add(metadatafieldNameAndValuesDto);
+        }
+        viewProductDto.setMetadatafieldNameAndValues(nameAndValuesDtos);
+        return viewProductDto;
+    }
+
+    public ViewProductVariationDto viewProductVariation(Long variationId , WebRequest webRequest,HttpServletRequest request){
+        Locale locale=webRequest.getLocale();
+        String sellerEmail = request.getUserPrincipal().getName();
+        Optional<ProductVariation> variationOptional = variationRepository.findById(variationId);
+        if(!variationOptional.isPresent()){
+            String message=messageSource.getMessage("msg.variation.invalid",null,locale);
+            throw new EmailException(message);
+        }
+        ProductVariation productVariation = variationOptional.get();
+        Product product = productVariation.getProduct();
+        if(product.getDeleted()){
+            String message=messageSource.getMessage("msg.product.deleted",null,locale);
+            throw new EmailException(message);
+        }
+        String email = product.getSeller().getUser().getEmail();
+        if(!email.equalsIgnoreCase(sellerEmail)){
+            String message=messageSource.getMessage("msg.seller.notProduct",null,locale);
+            throw new EmailException(message);
+        }
+       return setVariatioin(product,productVariation);
+    }
+
+    private ViewProductVariationDto setVariatioin(Product product,ProductVariation productVariation){
+        ViewProductVariationDto viewProductVariationDto=new ViewProductVariationDto();
+        viewProductVariationDto.setProductId(product.getId());
+        viewProductVariationDto.setProductName(product.getName());
+        viewProductVariationDto.setProductBrand(product.getBrand());
+        viewProductVariationDto.setProductDescription(product.getDescription());
+        viewProductVariationDto.setPrice(productVariation.getPrice());
+        viewProductVariationDto.setQuantityAvailable(productVariation.getQuantityAvailable());
+        viewProductVariationDto.setVariationActive(productVariation.getActive());
+        viewProductVariationDto.setCancellable(product.getCancellable());
+        viewProductVariationDto.setReturnable(product.getReturnable());
+        viewProductVariationDto.setPrimageImage(productVariation.getPrimaryImageName());
+        viewProductVariationDto.setSecondaryImage(SetConverter.convertToSet(productVariation.getSecondaryImageName()));
+        viewProductVariationDto.setMetadata(productVariation.getMetadata());
+
+        return viewProductVariationDto;
     }
 }

@@ -9,9 +9,9 @@ public class ProductDto {
 
     private String description;
 
-    private Boolean IsCancellable;
+    private Boolean isCancellable;
 
-    private Boolean IsReturnable;
+    private Boolean isReturnable;
 
     public String getName() {
         return name;
@@ -46,18 +46,19 @@ public class ProductDto {
     }
 
     public Boolean getCancellable() {
-        return IsCancellable;
+        return isCancellable;
     }
 
     public void setCancellable(Boolean cancellable) {
-        IsCancellable = cancellable;
+        isCancellable = cancellable;
     }
 
     public Boolean getReturnable() {
-        return IsReturnable;
+        return isReturnable;
     }
 
     public void setReturnable(Boolean returnable) {
-        IsReturnable = returnable;
+        isReturnable = returnable;
     }
+
 }
