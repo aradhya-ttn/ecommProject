@@ -1,19 +1,18 @@
 package com.bootcamp2020.ecommerceProject.dao;
 
 import com.bootcamp2020.ecommerceProject.dto.CategoryDto;
+import com.bootcamp2020.ecommerceProject.dto.CategoryFilteringDto;
 import com.bootcamp2020.ecommerceProject.dto.CategoryMetadatfieldValuesDto;
 import com.bootcamp2020.ecommerceProject.dto.CustomerCategoryDto;
 import com.bootcamp2020.ecommerceProject.dto.categorySellerDtos.CategoryAndSubCategoryDto;
 import com.bootcamp2020.ecommerceProject.dto.categorySellerDtos.MetadatafieldNameAndValuesDto;
-import com.bootcamp2020.ecommerceProject.entities.Category;
-import com.bootcamp2020.ecommerceProject.entities.CategoryMetadataField;
-import com.bootcamp2020.ecommerceProject.entities.CategoryMetadataFieldAndValues;
-import com.bootcamp2020.ecommerceProject.entities.CategoryMetadataFieldValues;
+import com.bootcamp2020.ecommerceProject.entities.*;
 import com.bootcamp2020.ecommerceProject.exceptions.EmailException;
 import com.bootcamp2020.ecommerceProject.exceptions.UserNotFoundException;
 import com.bootcamp2020.ecommerceProject.repositories.CategoryMetadataFieldRepository;
 import com.bootcamp2020.ecommerceProject.repositories.CategoryMetadataFieldValuesRepository;
 import com.bootcamp2020.ecommerceProject.repositories.CategoryRepository;
+import com.bootcamp2020.ecommerceProject.repositories.ProductRepository;
 import com.bootcamp2020.ecommerceProject.utils.SetConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -39,6 +38,9 @@ public class CategoryDao {
 
     @Autowired
     private CategoryMetadataFieldValuesRepository categoryMetadataFieldValuesRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     public String  saveMetadataField(String name, WebRequest webRequest){
         Locale locale=webRequest.getLocale();
@@ -262,10 +264,10 @@ public class CategoryDao {
             List<String> parents=new ArrayList<>();
             parents =getParents(category.getParentId(),parents);
             CategoryAndSubCategoryDto categoryAndSubCategoryDto=new CategoryAndSubCategoryDto();
-            List<MetadatafieldNameAndValuesDto> nameAndValuesDtos=new ArrayList<>();
             categoryAndSubCategoryDto.setCategoryId(categoryId);
             categoryAndSubCategoryDto.setParentName(parents);
             categoryAndSubCategoryDto.setCategoryName(category.getName());
+            List<MetadatafieldNameAndValuesDto> nameAndValuesDtos=new ArrayList<>();
             List<Object[]> metadataNameAndValues = categoryRepository.getMetadataNameAndValues(categoryId);
             for (Object[] object:  metadataNameAndValues) {
                 MetadatafieldNameAndValuesDto metadatafieldNameAndValuesDto=new MetadatafieldNameAndValuesDto();
@@ -299,5 +301,33 @@ public class CategoryDao {
             }
         }
         return customerCategoryDtos;
+    }
+
+    public CategoryFilteringDto getFilterData(Long categoryId,WebRequest webRequest){
+        Locale locale=webRequest.getLocale();
+        Category category = categoryRepository.findByid(categoryId);
+        if(category==null){
+            String message=messageSource.getMessage("msg.category.notExist",null,locale);
+            throw new EmailException(message);
+        }
+        List<Product> productList = productRepository.getProduct(categoryId);
+        Set<String> brandList=new HashSet<>();
+        for (Product product:productList) {
+            brandList.add(product.getBrand());
+        }
+        CategoryFilteringDto categoryFilteringDto=new CategoryFilteringDto();
+        List<MetadatafieldNameAndValuesDto> nameAndValuesDtoList=new ArrayList<>();
+        categoryFilteringDto.setCategoryName(category.getName());
+        List<Object[]> nameAndValues = categoryRepository.getMetadataNameAndValues(categoryId);
+        for (Object[] objects:nameAndValues) {
+            MetadatafieldNameAndValuesDto metadatafieldNameAndValuesDto=new MetadatafieldNameAndValuesDto();
+            metadatafieldNameAndValuesDto.setMetadataFieldName((String)objects[0]);
+            metadatafieldNameAndValuesDto.setMetadataFieldValues((String)objects[1]);
+            nameAndValuesDtoList.add(metadatafieldNameAndValuesDto);
+        }
+        categoryFilteringDto.setCategoryName(category.getName());
+        categoryFilteringDto.setBrandList(brandList);
+        categoryFilteringDto.setMetadatafieldNameAndValues(nameAndValuesDtoList);
+        return categoryFilteringDto;
     }
 }

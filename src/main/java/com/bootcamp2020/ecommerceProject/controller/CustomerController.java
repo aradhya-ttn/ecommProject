@@ -2,9 +2,9 @@ package com.bootcamp2020.ecommerceProject.controller;
 
 import com.bootcamp2020.ecommerceProject.dao.CategoryDao;
 import com.bootcamp2020.ecommerceProject.dao.CustomerDao;
-import com.bootcamp2020.ecommerceProject.dto.CustomerAddressDto;
-import com.bootcamp2020.ecommerceProject.dto.CustomerCategoryDto;
-import com.bootcamp2020.ecommerceProject.dto.CustomerProfileDto;
+import com.bootcamp2020.ecommerceProject.dao.ProductDao;
+import com.bootcamp2020.ecommerceProject.dto.*;
+import io.swagger.annotations.ApiModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 
+@ApiModel(description = "All Api which can be used by user")
 @RestController
 @RequestMapping(value = "/customer")
 public class CustomerController {
@@ -23,6 +24,9 @@ public class CustomerController {
 
     @Autowired
     private CategoryDao categoryDao;
+
+    @Autowired
+    private ProductDao productDao;
 
     @GetMapping(value = "/profile")
     public CustomerProfileDto getProfile(HttpServletRequest request){
@@ -62,5 +66,39 @@ public class CustomerController {
     @GetMapping(value = "/getAllCategory")
     public List<CustomerCategoryDto> getAllCategoryForCustomer(@RequestParam("categoryId") Long categoryId){
         return categoryDao.getAllCategoryForCustomer(categoryId);
+    }
+
+    @GetMapping(value = "/viewProduct")
+    public ViewCustomerProductDto viewProductForCustomer(@RequestParam("productId") Long productId,WebRequest webRequest){
+        return productDao.viewCustomerProduct(productId, webRequest);
+    }
+
+    @GetMapping(value = "/viewAllProduct")
+    public List<ViewCustomerAllProductDto> viewAllProductForCustomer(
+            @RequestParam(defaultValue = "0") String offset,
+            @RequestParam(defaultValue = "10") String max,
+            @RequestParam(defaultValue = "id") String field,
+            @RequestParam(defaultValue= "Ascending") String order,
+            @RequestParam("categoryId") Long categoryId,
+            WebRequest webRequest
+    ){
+        return productDao.viewCustomerAllProduct(categoryId,offset,webRequest,max,field,order);
+    }
+
+    @GetMapping(value = "/viewSimilarProduct")
+    public List<ViewCustomerAllProductDto> viewSimilarProduct(
+            @RequestParam(defaultValue = "0") String offset,
+            @RequestParam(defaultValue = "10") String max,
+            @RequestParam(defaultValue = "id") String field,
+            @RequestParam(defaultValue= "Ascending") String order,
+            @RequestParam("productId") Long productId,
+            WebRequest webRequest
+    ){
+        return productDao.viewSimilarProduct(productId,webRequest,offset,max,field,order);
+    }
+
+    @GetMapping(value = "/getCategoryDetail")
+    public CategoryFilteringDto getcategoryDetail(@RequestParam("categoryId") Long categoryId,WebRequest webRequest){
+        return categoryDao.getFilterData(categoryId,webRequest);
     }
 }

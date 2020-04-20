@@ -2,17 +2,17 @@ package com.bootcamp2020.ecommerceProject.controller;
 
 import com.bootcamp2020.ecommerceProject.dao.AdminDao;
 import com.bootcamp2020.ecommerceProject.dao.CategoryDao;
-import com.bootcamp2020.ecommerceProject.dto.AllCustomerDto;
-import com.bootcamp2020.ecommerceProject.dto.AllSellerDto;
-import com.bootcamp2020.ecommerceProject.dto.CategoryDto;
-import com.bootcamp2020.ecommerceProject.dto.CategoryMetadatfieldValuesDto;
+import com.bootcamp2020.ecommerceProject.dao.ProductDao;
+import com.bootcamp2020.ecommerceProject.dto.*;
 import com.bootcamp2020.ecommerceProject.entities.CategoryMetadataField;
+import io.swagger.annotations.ApiModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
 
+@ApiModel(description = "All Api which can be used by Admin")
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
@@ -22,6 +22,9 @@ public class AdminController {
 
     @Autowired
     private CategoryDao categoryDao;
+
+    @Autowired
+    private ProductDao productDao;
 
     @GetMapping("/customers")
     private List<AllCustomerDto> getAllCustomer(
@@ -120,5 +123,24 @@ public class AdminController {
     @PutMapping(value = "/activateProduct")
     private String activateProduct(@RequestParam("productId") Long productId,WebRequest webRequest){
         return adminDao.activateProduct(productId,webRequest);
+    }
+
+    @GetMapping(value = "/viewProduct")
+    public ViewCustomerProductDto viewProductForCustomer(@RequestParam("productId") Long productId, WebRequest webRequest){
+        return productDao.viewAdminProduct(productId, webRequest);
+    }
+    @GetMapping("/viewAllProduct")
+    private List<ViewCustomerAllProductDto> viewAllProduct(
+            @RequestParam(defaultValue = "0") String offset,
+            @RequestParam(defaultValue = "10") String max,
+            @RequestParam(defaultValue = "id") String field,
+            @RequestParam(defaultValue= "Ascending") String order
+    ){
+        return productDao.viewAllProduct(offset, max, field, order);
+    }
+
+    @PutMapping(value = "/deActivateProduct")
+    private String deActivateProduct(@RequestParam("productId") Long productId,WebRequest webRequest){
+        return adminDao.deActivateProduct(productId,webRequest);
     }
 }

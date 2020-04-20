@@ -14,14 +14,14 @@ public class Product {
     @JoinColumn(name = "SellerUserId")
     private Seller seller;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "CategoryId")
     private Category category;
 
     @OneToOne(mappedBy = "product")
     private ProductReview productReview;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
     private List<ProductVariation> productVariation;
 
     private String name;

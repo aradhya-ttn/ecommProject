@@ -6,6 +6,7 @@ import com.bootcamp2020.ecommerceProject.entities.Customer;
 import com.bootcamp2020.ecommerceProject.entities.Product;
 import com.bootcamp2020.ecommerceProject.entities.Seller;
 import com.bootcamp2020.ecommerceProject.entities.User;
+import com.bootcamp2020.ecommerceProject.exceptions.EmailException;
 import com.bootcamp2020.ecommerceProject.exceptions.UserNotFoundException;
 import com.bootcamp2020.ecommerceProject.repositories.CustomerRepository;
 import com.bootcamp2020.ecommerceProject.repositories.ProductRepository;
@@ -192,20 +193,59 @@ public class AdminDao {
     public String activateProduct(Long productId,WebRequest webRequest){
         Locale locale=webRequest.getLocale();
         Product product = productRepository.findByid(productId);
-        product.setActive(true);
-        productRepository.save(product);
+        if(product==null){
+            String message=messageSource.getMessage("msg.invalid.productId",null,locale);
+            throw new EmailException(message);
+        }
+        if(!product.getActive()) {
+            product.setActive(true);
+            productRepository.save(product);
 
-        String email = product.getSeller().getUser().getEmail();
-        SimpleMailMessage mailMessage=new SimpleMailMessage();
-        mailMessage.setTo(email);
-        String message=messageSource.getMessage("msg.seller.activated",null,locale);
-        mailMessage.setSubject(message);
-        String textMessage=messageSource.getMessage("msg.product.activated",null,locale);
-        String adminMessage=messageSource.getMessage("msg.by.admin",null,locale);
-        mailMessage.setText(textMessage+" "+product.getName()+" "+adminMessage);
-        String successMessage=messageSource.getMessage("msg.Activation.success",null,locale);
-        javaMailSender.send(mailMessage);
-        return successMessage;
+            String email = product.getSeller().getUser().getEmail();
+            SimpleMailMessage mailMessage=new SimpleMailMessage();
+            mailMessage.setTo(email);
+            String message=messageSource.getMessage("msg.seller.activated",null,locale);
+            mailMessage.setSubject(message);
+            String textMessage=messageSource.getMessage("msg.product.activated",null,locale);
+            String adminMessage=messageSource.getMessage("msg.by.admin",null,locale);
+            mailMessage.setText(textMessage+" "+product.getName()+" "+adminMessage);
+            String successMessage=messageSource.getMessage("msg.Activation.success",null,locale);
+            javaMailSender.send(mailMessage);
+            return successMessage;
+        }else{
+            String message=messageSource.getMessage("msg.product.alreadyActivated",null,locale);
+            return  message;
+        }
     }
-
+    public String deActivateProduct(Long productId,WebRequest webRequest) {
+        Locale locale = webRequest.getLocale();
+        Product product = productRepository.findByid(productId);
+        if (product == null) {
+            String message = messageSource.getMessage("msg.invalid.productId", null, locale);
+            throw new EmailException(message);
+        }
+        if (product.getActive()) {
+            product.setActive(false);
+            productRepository.save(product);
+            String messageBody = "Product : " + "\n" +
+                    " productId=" + product.getId() + "\n" +
+                    " seller=" + product.getSeller().getCompanyName() + "\n" +
+                    " category=" + product.getCategory().getName() + "\n" +
+                    " name=" + product.getName() + "\n" +
+                    " description=" + product.getDescription() + "\n" +
+                    " isCancellable=" + product.getCancellable() + "\n" +
+                    " isReturnable=" + product.getReturnable() + "\n" +
+                    " brand=" + product.getBrand() + "\n";
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
+            mailMessage.setText(messageBody);
+            mailMessage.setTo(product.getSeller().getUser().getEmail());
+            String deactivateMessage = messageSource.getMessage("msg.product.deActivated", null, locale);
+            mailMessage.setSubject(deactivateMessage);
+            javaMailSender.send(mailMessage);
+            return deactivateMessage;
+        } else {
+            String message = messageSource.getMessage("msg.product.alreadyDeActivated", null, locale);
+            return message;
+        }
+    }
 }

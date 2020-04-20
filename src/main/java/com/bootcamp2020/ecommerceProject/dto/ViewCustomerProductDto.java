@@ -1,11 +1,8 @@
 package com.bootcamp2020.ecommerceProject.dto;
 
-import com.bootcamp2020.ecommerceProject.dto.categorySellerDtos.MetadatafieldNameAndValuesDto;
-
 import java.util.List;
 
-public class ViewProductDto {
-    private Long productId;
+public class ViewCustomerProductDto {
 
     private String productName;
 
@@ -17,21 +14,11 @@ public class ViewProductDto {
 
     private Boolean isReturnable;
 
-    private Boolean isActive;
-
     private Long categoryId;
 
     private String categoryName;
 
-    private List<MetadatafieldNameAndValuesDto> metadatafieldNameAndValues;
-
-    public Long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
+    private List<ProductVariationDto> variation;
 
     public String getProductName() {
         return productName;
@@ -73,14 +60,6 @@ public class ViewProductDto {
         isReturnable = returnable;
     }
 
-    public Boolean getActive() {
-        return isActive;
-    }
-
-    public void setActive(Boolean active) {
-        isActive = active;
-    }
-
     public Long getCategoryId() {
         return categoryId;
     }
@@ -97,11 +76,11 @@ public class ViewProductDto {
         this.categoryName = categoryName;
     }
 
-    public List<MetadatafieldNameAndValuesDto> getMetadatafieldNameAndValues() {
-        return metadatafieldNameAndValues;
+    public List<ProductVariationDto> getVariation() {
+        return variation;
     }
 
-    public void setMetadatafieldNameAndValues(List<MetadatafieldNameAndValuesDto> metadatafieldNameAndValues) {
-        this.metadatafieldNameAndValues = metadatafieldNameAndValues;
+    public void setVariation(List<ProductVariationDto> variation) {
+        this.variation = variation;
     }
 }

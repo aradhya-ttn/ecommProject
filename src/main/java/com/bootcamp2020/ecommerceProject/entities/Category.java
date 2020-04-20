@@ -16,7 +16,7 @@ public class Category {
     @OneToMany(mappedBy = "category",cascade = CascadeType.ALL)
     private Set<CategoryMetadataFieldValues> categoryMetadataFieldValuesList;
 
-    @OneToMany(mappedBy = "category")
+    @OneToMany(mappedBy = "category",cascade = CascadeType.ALL)
     private Set<Product> products;
 
     public Long getId() {

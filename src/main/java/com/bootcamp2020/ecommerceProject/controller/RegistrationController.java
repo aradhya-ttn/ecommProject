@@ -2,6 +2,7 @@ package com.bootcamp2020.ecommerceProject.controller;
 
 import com.bootcamp2020.ecommerceProject.dao.ActivationDao;
 import com.bootcamp2020.ecommerceProject.repositories.UserRepository;
+import io.swagger.annotations.ApiModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
+@ApiModel(description = "Api to activate user and seller through email")
 @RestController
 public class RegistrationController {
    @Autowired

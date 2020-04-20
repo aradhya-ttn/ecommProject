@@ -1,5 +1,6 @@
 package com.bootcamp2020.ecommerceProject.controller;
 
+import io.swagger.annotations.ApiModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.token.TokenStore;
@@ -8,8 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
+@ApiModel(description = "Logout Api for all user")
 @RestController
-public class LoginController {
+public class LogOutController {
 
     @Autowired
     private TokenStore tokenStore;
@@ -30,18 +32,18 @@ public class LoginController {
         return "index";
     }
 
-    @GetMapping("/admin/home")
-    public String adminHome(){
-        return "Admin home";
-    }
-
-    @GetMapping("/user/home")
-    public String userHome(){
-        return "User home";
-    }
-
-    @GetMapping("/seller/home")
-    public String sellerHome(){
-        return "Seller home";
-    }
+//    @GetMapping("/admin/home")
+//    public String adminHome(){
+//        return "Admin home";
+//    }
+//
+//    @GetMapping("/user/home")
+//    public String userHome(){
+//        return "User home";
+//    }
+//
+//    @GetMapping("/seller/home")
+//    public String sellerHome(){
+//        return "Seller home";
+//    }
 }

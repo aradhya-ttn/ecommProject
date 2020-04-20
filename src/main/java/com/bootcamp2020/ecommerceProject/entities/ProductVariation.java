@@ -12,7 +12,7 @@ public class  ProductVariation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "ProductId")
     private Product product;
 

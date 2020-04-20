@@ -3,24 +3,23 @@ package com.bootcamp2020.ecommerceProject.dto;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
 
-public class AddProductVariationDto {
-
+public class UpdateProductVariationDto {
     @NotNull
-    private Long productId;
-
+    private Long productVariationId;
 
     private Map<String ,String> metadata;
 
     private Integer quantityAvailable;
 
     private Double price;
+    private Boolean isActive;
 
-    public Long getProductId() {
-        return productId;
+    public Long getProductVariationId() {
+        return productVariationId;
     }
 
-    public void setProductId(Long productId) {
-        this.productId = productId;
+    public void setProductVariationId(Long productVariationId) {
+        this.productVariationId = productVariationId;
     }
 
     public Map<String, String> getMetadata() {
@@ -30,7 +29,6 @@ public class AddProductVariationDto {
     public void setMetadata(Map<String, String> metadata) {
         this.metadata = metadata;
     }
-
 
     public Integer getQuantityAvailable() {
         return quantityAvailable;
@@ -48,13 +46,11 @@ public class AddProductVariationDto {
         this.price = price;
     }
 
-    @Override
-    public String toString() {
-        return "AddProductVariationDto{" +
-                "productId=" + productId +
-                ", metadata=" + metadata +
-                ", quantityAvailable=" + quantityAvailable +
-                ", price=" + price +
-                '}';
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
     }
 }

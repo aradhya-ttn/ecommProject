@@ -53,6 +53,7 @@ public class CustomerDao {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     public void doRegisterCustomer(CustomerRegisterDto customerRegister, WebRequest webRequest) {
         Locale locale=webRequest.getLocale();
 

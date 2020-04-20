@@ -4,6 +4,7 @@ import com.bootcamp2020.ecommerceProject.dao.CustomerDao;
 import com.bootcamp2020.ecommerceProject.dao.SellerDao;
 import com.bootcamp2020.ecommerceProject.dto.CustomerRegisterDto;
 import com.bootcamp2020.ecommerceProject.dto.SellerRegisterDto;
+import io.swagger.annotations.ApiModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.context.request.WebRequest;
 import javax.validation.Valid;
 import java.util.Locale;
 
+@ApiModel(description = "Api to register customer and seller")
 @RestController
 @RequestMapping(value = "/register")
 public class RegisterController {

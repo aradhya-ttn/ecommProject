@@ -5,6 +5,7 @@ import com.bootcamp2020.ecommerceProject.dao.ProductDao;
 import com.bootcamp2020.ecommerceProject.dao.SellerDao;
 import com.bootcamp2020.ecommerceProject.dto.*;
 import com.bootcamp2020.ecommerceProject.dto.categorySellerDtos.CategoryAndSubCategoryDto;
+import io.swagger.annotations.ApiModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
@@ -14,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-
+@ApiModel(description = "All Api which can be used by seller")
 @RestController
 @RequestMapping(value = "/seller")
 public class SellerController {
@@ -72,6 +73,44 @@ public class SellerController {
     @GetMapping(value = "/viewProductVariation")
     private ViewProductVariationDto viewProductVariation(@RequestParam("variationId") Long variationId, WebRequest webRequest, HttpServletRequest request){
         return productDao.viewProductVariation(variationId, webRequest,request);
+    }
+
+    @GetMapping(value = "/viewAllProduct")
+    private List<ViewProductDto> viewAllproduct(
+            @RequestParam(defaultValue = "0") String offset,
+            @RequestParam(defaultValue = "10") String max,
+            @RequestParam(defaultValue = "id") String field,
+            @RequestParam(defaultValue= "Ascending") String order,
+            HttpServletRequest request
+    ){
+        return productDao.viewAllProduct(offset,max,field,order,request);
+    }
+    @GetMapping(value = "/viewAllProductVariation")
+    private List<ViewAllProductVariationDto> productVariationList(
+            @RequestParam("productId") Long productId,
+            @RequestParam(defaultValue = "0") String offset,
+            @RequestParam(defaultValue = "10") String max,
+            @RequestParam(defaultValue = "id") String field,
+            @RequestParam(defaultValue= "Ascending") String order,
+            HttpServletRequest request,WebRequest webRequest
+    ){
+        return productDao.viewAllProductVariation(productId, offset, max, field, order, request, webRequest);
+    }
+    @DeleteMapping(value = "/deleteProduct")
+    private String deleteProduct(@RequestParam("productId")Long productId,HttpServletRequest request,WebRequest webRequest){
+        return productDao.deleteProduct(productId, request, webRequest);
+    }
+
+    @PutMapping("/updateProduct")
+    private String updateProduct(@RequestBody UpdateProductDto updateProductDto,HttpServletRequest request,WebRequest webRequest){
+        return productDao.updateProduct(updateProductDto,request,webRequest);
+    }
+    @PutMapping(value = "/updateProductVariation",consumes ={"multipart/form-data"})
+    private String updateProductVariation(@RequestPart("primaryImage") MultipartFile primaryImage,
+                                       @RequestPart("secondaryImage") List<MultipartFile> secondaryImage,
+                                       @RequestPart("updateProductVariationDto") UpdateProductVariationDto updateProductVariationDto,
+                                       WebRequest webRequest,HttpServletRequest request ) throws IOException {
+        return productDao.updateProductVariation(primaryImage,secondaryImage,request,updateProductVariationDto,webRequest);
     }
 
 }

@@ -2,10 +2,11 @@ package com.bootcamp2020.ecommerceProject.controller;
 
 
 import com.bootcamp2020.ecommerceProject.dao.ForgotPasswordDao;
+import io.swagger.annotations.ApiModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
-
+@ApiModel(description = "Api to reset and update password")
 @RestController
 @RequestMapping(value = "/password")
 public class PasswordController {
